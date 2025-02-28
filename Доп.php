@@ -1,57 +1,52 @@
 <?php
 function calculate($expression)
 {
-  $expression = str_replace(' ', '', $expression);
-  $expression = str_split($expression);
-  $allowedChars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '-', '*', '/'];
-  foreach ($expression as $char) {
-    if (!in_array($char, $allowedChars)) {
-      return "Error";
-    }
+  $expression = trim($expression);
+  if (is_numeric($expression)) {
+    return (float)$expression;
   }
-  $numbers = [];
-  $operators = [];
-  $currentNumber = "";
-  $isFirstNumber = true;
-  foreach ($expression as $char) {
-    if (is_numeric($char) || ($char === '-' && $isFirstNumber)) {
-      $currentNumber .= $char;
-      $isFirstNumber = false;
-    } else {
-      if (!empty($currentNumber)) {
-        $numbers[] = (int)$currentNumber;
-        $currentNumber = "";
+  $opIndex = -1;
+  $minPriority = 4;
+  $operators = ['+', '-', '*', '/'];
+  foreach ($operators as $i => $op) {
+    $index = strpos($expression, $op);
+    if ($index !== false) {
+      $priority = ($op === '+' || $op === '-') ? 1 : 2;
+      if ($priority <= $minPriority) {
+        $minPriority = $priority;
+        $opIndex = $index;
+        $operator = $op;
       }
-      $operators[] = $char;
     }
   }
-  if (!empty($currentNumber)) {
-    $numbers[] = (int)$currentNumber;
+  if ($opIndex === -1){
+    return "Error";
   }
-  if (count($numbers) > 5 || count($numbers) === 0) return "Error";
-  if (count($numbers) !== count($operators) + 1) return "Error";
-  $result = $numbers[0];
-  for ($i = 0; $i < count($operators); $i++) {
-    $operator = $operators[$i];
-    $nextNumber = $numbers[$i + 1];
-    if ($operator === '+') {
-      $result += $nextNumber;
-    } else if ($operator === '-') {
-      $result -= $nextNumber;
-    } else if ($operator === '*') {
-      $result *= $nextNumber;
-    } else if ($operator === '/') {
-      if ($nextNumber === 0) return "Error";
-      $result /= $nextNumber;
-    }
+  $leftOperand = trim(substr($expression, 0, $opIndex));
+  $rightOperand = trim(substr($expression, $opIndex + 1));
+  $left = calculate($leftOperand);
+  $right = calculate($rightOperand);
+  switch ($operator) {
+    case '+':
+      return $left + $right;
+    case '-':
+      return $left - $right;
+    case '*':
+      return $left * $right;
+    case '/':
+      if ($right === 0) {
+        return "Error";
+      }
+      return $left / $right;
+    default:
+      return "Error";
   }
-  return $result;
 }
 echo "Введите арифметическое выражение: ";
 $expression = readline();
 $result = calculate($expression);
 if ($result === "Error") {
-  echo "Error" . PHP_EOL;
+  echo "Ошибка: " . $result . PHP_EOL;
 } else {
   echo "Ответ: " . $result . PHP_EOL;
 }
