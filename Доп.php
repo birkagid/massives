@@ -47,13 +47,11 @@ function calculate($expression)
   }
   return $result;
 }
-$expressions = ["2+4", "-2+8-4", "abc", "5///5", "5/0"];
-foreach ($expressions as $exp) {
-  $result = calculate($exp);
-  echo $exp . " = ";
-  if ($result === "Error") {
-    echo "Error" . PHP_EOL;
-  } else {
-    echo $result . PHP_EOL;
-  }
+echo "Введите арифметическое выражение: ";
+$expression = readline();
+$result = calculate($expression);
+if ($result === "Error") {
+  echo "Error" . PHP_EOL;
+} else {
+  echo "Ответ: " . $result . PHP_EOL;
 }
