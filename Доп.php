@@ -1,5 +1,5 @@
 <?php
-function calculate($expression)
+function calculate(string $expression): string
 {
   $expression = trim($expression);
   if (is_numeric($expression)) {
